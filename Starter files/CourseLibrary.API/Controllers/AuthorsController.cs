@@ -49,10 +49,10 @@ public class AuthorsController : ControllerBase
 
         // return author
         return Ok(_mapper.Map<AuthorDto>(authorFromRepo));
-    }
+    } 
 
     [HttpPost()]
-    public async Task<ActionResult<AuthorDto>> CreateAuthor(AuthorDto author)
+    public async Task<ActionResult<AuthorDto>> CreateAuthor(AuthorForCreationDto author)
     {
         var authorEntity = _mapper.Map<Entities.Author>(author);
 
