@@ -1,6 +1,8 @@
 ﻿using CourseLibrary.API.DbContexts;
 using CourseLibrary.API.Services;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace CourseLibrary.API;
 
@@ -9,7 +11,14 @@ internal static class StartupHelperExtensions
     // Add services to the container
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        builder.Services.AddControllers(configure =>
+        {
+            configure.ReturnHttpNotAcceptable = true;
+            
+            /// That is one way of doing it --> adding only the output formatter. 
+            /// Below shows how to add both input and output formatters in one line
+            //configure.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
+        }).AddXmlDataContractSerializerFormatters();
 
         builder.Services.AddScoped<ICourseLibraryRepository, 
             CourseLibraryRepository>();
