@@ -118,11 +118,13 @@ public class CourseLibraryRepository : ICourseLibraryRepository
         
         var mainCategory = authorsResourceParameters.MainCategory;
         var searchQuery = authorsResourceParameters.SearchQuery;
+        var pageSize = authorsResourceParameters.PageSize;
+        var pageNumber = authorsResourceParameters.PageNumber;
         
-        if (string.IsNullOrEmpty(mainCategory) && string.IsNullOrEmpty(searchQuery))
-        {
-            return await GetAuthorsAsync();
-        }
+        // if (string.IsNullOrEmpty(mainCategory) && string.IsNullOrEmpty(searchQuery))
+        // {
+        //     return await GetAuthorsAsync();
+        // }
 
         // collection to start from
         var collection = _context.Authors as IQueryable<Author>;
@@ -142,7 +144,10 @@ public class CourseLibraryRepository : ICourseLibraryRepository
                             || a.LastName.Contains(searchQuery));
         }
         
-        return await collection.ToListAsync();
+        return await collection
+            .Skip(pageSize * (pageNumber-1))
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<Author> GetAuthorAsync(Guid authorId)
