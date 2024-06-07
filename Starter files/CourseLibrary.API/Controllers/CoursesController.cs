@@ -103,9 +103,31 @@ public class CoursesController : ControllerBase
     public async Task<IActionResult> PartiallyUpdateCourse(
         Guid authorId,
         Guid courseId,
-        JsonPatchDocument<CourseForUpdateDto> course)
+        JsonPatchDocument<CourseForUpdateDto> patchDocument)
     {
+        if (!await _courseLibraryRepository.AuthorExistsAsync(authorId))
+        {
+            return NotFound();
+        }
+
+        var courseForAuthorFromRepo = await _courseLibraryRepository.GetCourseAsync(authorId, courseId);
+
+        if (courseForAuthorFromRepo == null)
+        {
+            return NotFound();
+        }
+
+        var courseToPatch = _mapper.Map<CourseForUpdateDto>(courseForAuthorFromRepo);
+
+        patchDocument.ApplyTo(courseToPatch);
         
+        //TODO: Validate patchDocument, there might be errors
+
+        _mapper.Map(courseToPatch, courseForAuthorFromRepo); // Via Reverse Map
+        _courseLibraryRepository.UpdateCourse(courseForAuthorFromRepo);
+        await _courseLibraryRepository.SaveAsync();
+
+        return NoContent();
     }
     
 

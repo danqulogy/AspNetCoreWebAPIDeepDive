@@ -3,6 +3,7 @@ using CourseLibrary.API.Services;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using Newtonsoft.Json.Serialization;
 
 namespace CourseLibrary.API;
 
@@ -18,7 +19,13 @@ internal static class StartupHelperExtensions
             /// That is one way of doing it --> adding only the output formatter. 
             /// Below shows how to add both input and output formatters in one line
             //configure.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
-        }).AddXmlDataContractSerializerFormatters();
+        }).AddXmlDataContractSerializerFormatters()
+            // Microsoft.AspNetCore.JsonPatch library is not feature complete
+            // It needs Microsoft.AspNetCore.Mvc.Newtonsoftjson to function fully
+            .AddNewtonsoftJson(setupAction =>
+            {
+                setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            }); 
 
         builder.Services.AddScoped<ICourseLibraryRepository, 
             CourseLibraryRepository>();
