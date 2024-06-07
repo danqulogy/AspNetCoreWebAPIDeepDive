@@ -65,4 +65,18 @@ public class AuthorsController : ControllerBase
             new { authorId = authorToReturn.Id },
             authorToReturn);
     }
+
+
+    /// <summary>
+    /// Options describe capabilities of an API in our /api/authors has a GET, HEAD,POST and obviously OPTIONS endpoints
+    /// So we describe them by adding them to the Headers
+    /// The content length must be Zero, AspNetCore takes care of that
+    /// </summary>
+    /// <returns></returns>
+    [HttpOptions]
+    public IActionResult GetAuthorsOptions()
+    {
+        Response.Headers.Add("Allow", "GET,HEAD,POST,OPTIONS");
+        return Ok();
+    }
 }
