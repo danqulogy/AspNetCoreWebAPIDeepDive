@@ -144,9 +144,12 @@ public class CoursesController : ControllerBase
 
         var courseToPatch = _mapper.Map<CourseForUpdateDto>(courseForAuthorFromRepo);
 
-        patchDocument.ApplyTo(courseToPatch);
-        
-        //TODO: Validate patchDocument, there might be errors
+        patchDocument.ApplyTo(courseToPatch, ModelState); // Ensures raw patchDocumentState is validated. Afterwards the check below will take care of returning
+
+        if (!TryValidateModel(courseToPatch)) // This triggers validation on the DTO and errors will automatically end up in the model state
+        {
+            return ValidationProblem(ModelState);
+        }
 
         _mapper.Map(courseToPatch, courseForAuthorFromRepo); // Via Reverse Map
         _courseLibraryRepository.UpdateCourse(courseForAuthorFromRepo);
