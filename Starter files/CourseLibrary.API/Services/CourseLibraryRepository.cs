@@ -108,17 +108,32 @@ public class CourseLibraryRepository : ICourseLibraryRepository
         _context.Authors.Remove(author);
     }
 
-    public async Task<IEnumerable<Author>> GetAuthorsAsync(string? mainCategory)
+    public async Task<IEnumerable<Author>> GetAuthorsAsync(string? mainCategory, string? searchQuery)
     {
-        if (string.IsNullOrEmpty(mainCategory))
+        if (string.IsNullOrEmpty(mainCategory) && string.IsNullOrEmpty(searchQuery))
         {
             return await GetAuthorsAsync();
         }
 
-        mainCategory = mainCategory.Trim();
+        // collection to start from
+        var collection = _context.Authors as IQueryable<Author>;
 
-        return await _context.Authors.Where(a => a.MainCategory == mainCategory)
-            .ToListAsync();
+        if (!string.IsNullOrEmpty(mainCategory))
+        {
+            mainCategory = mainCategory.Trim();
+            collection = collection.Where(a => a.MainCategory == mainCategory);
+        }
+
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            searchQuery = searchQuery.Trim();
+            collection = collection
+                .Where(a => a.MainCategory.Contains(searchQuery)
+                            || a.FirstName.Contains(searchQuery)
+                            || a.LastName.Contains(searchQuery));
+        }
+        
+        return await collection.ToListAsync();
     }
 
     public async Task<Author> GetAuthorAsync(Guid authorId)
