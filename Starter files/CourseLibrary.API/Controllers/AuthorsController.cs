@@ -27,7 +27,7 @@ public class AuthorsController : ControllerBase
     [HttpHead]
     public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors()
     {
-        //throw new Exception("Getting authors failed");
+        // throw new Exception("Getting authors failed");
         // get authors from repo
         var authorsFromRepo = await _courseLibraryRepository
             .GetAuthorsAsync(); 
