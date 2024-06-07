@@ -19,13 +19,14 @@ internal static class StartupHelperExtensions
             /// That is one way of doing it --> adding only the output formatter. 
             /// Below shows how to add both input and output formatters in one line
             //configure.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
-        }).AddXmlDataContractSerializerFormatters()
+        })
             // Microsoft.AspNetCore.JsonPatch library is not feature complete
             // It needs Microsoft.AspNetCore.Mvc.Newtonsoftjson to function fully
             .AddNewtonsoftJson(setupAction =>
             {
                 setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            }); 
+            })
+            .AddXmlDataContractSerializerFormatters(); 
 
         builder.Services.AddScoped<ICourseLibraryRepository, 
             CourseLibraryRepository>();
