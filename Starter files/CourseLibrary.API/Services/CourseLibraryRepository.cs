@@ -108,6 +108,19 @@ public class CourseLibraryRepository : ICourseLibraryRepository
         _context.Authors.Remove(author);
     }
 
+    public async Task<IEnumerable<Author>> GetAuthorsAsync(string? mainCategory)
+    {
+        if (string.IsNullOrEmpty(mainCategory))
+        {
+            return await GetAuthorsAsync();
+        }
+
+        mainCategory = mainCategory.Trim();
+
+        return await _context.Authors.Where(a => a.MainCategory == mainCategory)
+            .ToListAsync();
+    }
+
     public async Task<Author> GetAuthorAsync(Guid authorId)
     {
         if (authorId == Guid.Empty)
