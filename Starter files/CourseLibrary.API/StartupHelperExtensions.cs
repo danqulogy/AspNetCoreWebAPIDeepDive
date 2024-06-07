@@ -16,8 +16,8 @@ internal static class StartupHelperExtensions
         {
             configure.ReturnHttpNotAcceptable = true;
             
-            /// That is one way of doing it --> adding only the output formatter. 
-            /// Below shows how to add both input and output formatters in one line
+            // That is one way of doing it --> adding only the output formatter. 
+            // Below shows how to add both input and output formatters in one line
             //configure.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
         })
             // Microsoft.AspNetCore.JsonPatch library is not feature complete
