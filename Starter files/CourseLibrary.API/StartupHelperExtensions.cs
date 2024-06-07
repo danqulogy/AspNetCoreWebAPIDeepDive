@@ -3,6 +3,8 @@ using CourseLibrary.API.Services;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json.Serialization;
 
 namespace CourseLibrary.API;
@@ -26,7 +28,35 @@ internal static class StartupHelperExtensions
             {
                 setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             })
-            .AddXmlDataContractSerializerFormatters(); 
+            .AddXmlDataContractSerializerFormatters()
+            .ConfigureApiBehaviorOptions(setupAction =>
+            {
+                setupAction.InvalidModelStateResponseFactory = context =>
+                {
+                    // Create a validation problem details object
+                    var problemDetailsFactory =
+                        context.HttpContext.RequestServices
+                            .GetRequiredService<ProblemDetailsFactory>();
+
+                    var validationProblemDetails = problemDetailsFactory
+                        .CreateValidationProblemDetails(context.HttpContext, context.ModelState);
+                    
+                    // add additional info not added by default
+                    validationProblemDetails.Detail = "See the errors field for details";
+                    validationProblemDetails.Instance = context.HttpContext.Request.Path;
+                    
+                    // report invalid model state responses as validation issues
+                    validationProblemDetails.Status = StatusCodes.Status422UnprocessableEntity;
+                    validationProblemDetails.Type = "https://courselibrary.com/modelvalidationproblem";
+                    validationProblemDetails.Title = "One or more validation errors occured";
+
+                    return new UnprocessableEntityObjectResult(validationProblemDetails)
+                    {
+                        ContentTypes = {"application/problem+json"}
+                    };
+
+                };
+            }); 
 
         builder.Services.AddScoped<ICourseLibraryRepository, 
             CourseLibraryRepository>();
