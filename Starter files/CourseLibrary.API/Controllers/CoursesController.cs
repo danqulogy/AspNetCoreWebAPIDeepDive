@@ -2,6 +2,7 @@
 using AutoMapper;
 using CourseLibrary.API.Models;
 using CourseLibrary.API.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourseLibrary.API.Controllers;
@@ -96,6 +97,17 @@ public class CoursesController : ControllerBase
         await _courseLibraryRepository.SaveAsync();
         return NoContent();
     }
+
+
+    [HttpPatch("{courseId}")]
+    public async Task<IActionResult> PartiallyUpdateCourse(
+        Guid authorId,
+        Guid courseId,
+        JsonPatchDocument<CourseForUpdateDto> course)
+    {
+        
+    }
+    
 
     [HttpDelete("{courseId}")]
     public async Task<ActionResult> DeleteCourseForAuthor(Guid authorId, Guid courseId)
